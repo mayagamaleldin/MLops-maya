@@ -1,0 +1,19 @@
+vars:
+  - params/base.yaml
+
+stages:
+  preprocess:
+    cmd: python src/processing.py
+    deps:
+      - src/processing.py
+      - data/raw/train.csv
+      - data/raw/test.csv
+    params:
+      - params/base.yaml:
+          - data.raw_train_path
+          - data.raw_test_path
+          - data.processed_dir
+          - data.train_processed
+          - data.test_processed
+    outs:
+      - data/processed
