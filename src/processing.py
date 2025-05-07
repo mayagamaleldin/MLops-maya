@@ -6,14 +6,10 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 import yaml
 
-def preprocess_and_save():
-    # Load config
-    cfg = yaml.safe_load(open("params/base.yaml"))
-    data_cfg = cfg["data"]
-
+def preprocess_and_save(raw_train_path, raw_test_path, processed_dir):
     # Load raw data
-    train_df = pd.read_csv(data_cfg["raw_train_path"])
-    test_df = pd.read_csv(data_cfg["raw_test_path"])
+    train_df = pd.read_csv(raw_train_path)
+    test_df = pd.read_csv(raw_test_path)
 
     # Define features and target
     features = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
@@ -41,14 +37,16 @@ def preprocess_and_save():
     y_train = train_df[target]
 
     # ✅ Ensure the output directory exists
-    os.makedirs(data_cfg["processed_dir"], exist_ok=True)
+    os.makedirs(processed_dir, exist_ok=True)
     
     # Save the processed feature and target datasets
-    pd.DataFrame(X_train).to_csv(os.path.join(data_cfg["processed_dir"], "X_train.csv"), index=False)
-    pd.DataFrame(X_test).to_csv(os.path.join(data_cfg["processed_dir"], "X_test.csv"), index=False)
-    y_train.to_csv(os.path.join(data_cfg["processed_dir"], "y_train.csv"), index=False)
+    pd.DataFrame(X_train).to_csv(os.path.join(processed_dir, "X_train.csv"), index=False)
+    pd.DataFrame(X_test).to_csv(os.path.join(processed_dir, "X_test.csv"), index=False)
+    y_train.to_csv(os.path.join(processed_dir, "y_train.csv"), index=False)
 
     print("Preprocessing complete and data saved successfully!")
 
 if __name__ == "__main__":
-    preprocess_and_save()
+    # Example: Modify to call the function with required arguments if needed
+    # preprocess_and_save(raw_train_path="data/raw/train.csv", raw_test_path="data/raw/test.csv", processed_dir="data/processed")
+    preprocess_and_save()  # Only for testing purposes; this line is irrelevant in main.py

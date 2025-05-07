@@ -15,13 +15,14 @@ def load_config(model_type):
         model_config_path = f"params/models/{model_type}.yaml"
         if not os.path.exists(model_config_path):
             raise FileNotFoundError(f"Model config file not found: {model_config_path}")
-            
+        
         with open(model_config_path, 'r') as file:
             model_cfg = yaml.safe_load(file) or {}
 
         # Set default output directory if not specified
         base_cfg.setdefault('model', {}).setdefault('output_dir', 'models')
         
+        # Combine configurations, giving priority to model-specific settings
         return {
             'data': base_cfg.get('data', {}),
             'model': {
@@ -32,6 +33,8 @@ def load_config(model_type):
         
     except yaml.YAMLError as e:
         raise ValueError(f"Error parsing YAML config: {str(e)}")
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Configuration file error: {str(e)}")
     except Exception as e:
         raise RuntimeError(f"Failed to load config: {str(e)}")
 
@@ -48,22 +51,27 @@ def main():
         
         print(f"Starting pipeline for model: {model_type}")
         
-        # Load config
+        # Load configuration for the specified model
         print("Loading configuration...")
         cfg = load_config(model_type)
         
         # Step 1: Preprocessing
         print("\nStep 1: Running preprocessing...")
-        preprocess_and_save()
+        preprocess_and_save(
+            raw_train_path=cfg['data'].get('raw_train_path'),
+            raw_test_path=cfg['data'].get('raw_test_path'),
+            processed_dir=cfg['data'].get('processed_dir', 'data/processed')
+        )
         
         # Step 2: Model training
         print("\nStep 2: Training model...")
-        train_and_save_models(
+        model_path = train_and_save_models(
             model_cfg=cfg['model'],
             processed_dir=cfg['data'].get('processed_dir', 'data/processed')
         )
         
-        print("\nPipeline completed successfully!")
+        print(f"\nModel saved to: {model_path}")
+        print("Pipeline completed successfully!")
         
     except Exception as e:
         print(f"\nError in pipeline execution: {str(e)}")

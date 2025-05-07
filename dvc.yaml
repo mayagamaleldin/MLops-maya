@@ -1,5 +1,5 @@
 vars:
-  - params/base.yaml
+  - params/base.yaml  # Reference to the config file containing parameters
 
 stages:
   preprocess:
@@ -17,3 +17,18 @@ stages:
           - data.test_processed
     outs:
       - data/processed
+
+  train:
+    cmd: python src/train.py  # This will invoke the training script
+    deps:
+      - src/train.py
+      - data/processed/train.csv  # Processed data file as input
+      - data/processed/test.csv   # Processed test data file as input
+    params:
+      - params/base.yaml:
+          - model.type          # The model type (e.g., RandomForestClassifier, LogisticRegression)
+          - model.name          # The model name (used in output)
+          - model.output_dir    # Directory to save the trained model
+          - model.params.lr     # The learning rate (if available in config)
+    outs:
+      - models/  # Output directory for the trained model
