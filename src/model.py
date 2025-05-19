@@ -4,8 +4,11 @@ import pandas as pd
 import numpy as np  # Add this import
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from mlflow.models import infer_signature
 import mlflow
 import mlflow.sklearn
+import pickle
+
 
 def train_and_save_models(model_cfg, processed_dir):
     try:
@@ -39,8 +42,10 @@ def train_and_save_models(model_cfg, processed_dir):
             # Train model with progress output
             print("Training model...")
             model.fit(X_train, y_train)
-            print("Training completed!")
-
+            #save model 2222
+            model_pkl_file = "titanic_model.pkl" 
+            with open(model_pkl_file, 'wb') as file:  
+                pickle.dump(model, file) 
             # Save model
             os.makedirs(model_cfg['output_dir'], exist_ok=True)
             model_path = os.path.join(model_cfg['output_dir'], f"{model_cfg['name']}.pkl")

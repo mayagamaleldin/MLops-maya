@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 import yaml
+import pickle
 
 def preprocess_and_save(raw_train_path, raw_test_path, processed_dir):
     # Load raw data
@@ -35,6 +36,8 @@ def preprocess_and_save(raw_train_path, raw_test_path, processed_dir):
     X_train = preprocessor.fit_transform(train_df[features])
     X_test = preprocessor.transform(test_df[features])
     y_train = train_df[target]
+    # Full pipeline: preprocessing + model
+    clf = Pipeline(steps=[("preprocessor", preprocessor)])
 
     # ✅ Ensure the output directory exists
     os.makedirs(processed_dir, exist_ok=True)
@@ -45,6 +48,8 @@ def preprocess_and_save(raw_train_path, raw_test_path, processed_dir):
     y_train.to_csv(os.path.join(processed_dir, "y_train.csv"), index=False)
 
     print("Preprocessing complete and data saved successfully!")
+    with open("pipline_feature_trans.pkl", "wb") as f:
+        pickle.dump(clf, f)
 
 if __name__ == "__main__":
     # Example: Modify to call the function with required arguments if needed
